@@ -1,0 +1,135 @@
+### Engreader API Test Requests
+### Base URL: http://localhost:5000
+
+@baseUrl = http://localhost:5000
+@accessToken = 
+
+### 1. Health Check - Swagger UI
+### Open http://localhost:5000 in browser for interactive API documentation
+
+### 2. Register New User
+POST {{baseUrl}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "Test123!",
+  "firstName": "Test",
+  "lastName": "User",
+  "nativeLanguage": "tr"
+}
+
+### 3. Login User (Copy accessToken from response)
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "Test123!"
+}
+
+### 4. Get Current User
+GET {{baseUrl}}/api/v1/auth/me
+Authorization: Bearer {{accessToken}}
+
+### 5. Generate Story (Requires OpenAI API key in appsettings.json)
+POST {{baseUrl}}/api/v1/stories
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "level": 1,
+  "topic": "Daily Routine",
+  "targetWords": ["breakfast", "morning", "school", "homework", "dinner"],
+  "wordCount": 300
+}
+
+### 6. Get All Stories
+GET {{baseUrl}}/api/v1/stories
+Authorization: Bearer {{accessToken}}
+
+### 7. Get Story by ID
+GET {{baseUrl}}/api/v1/stories/{{storyId}}
+Authorization: Bearer {{accessToken}}
+
+### 8. Generate Quiz for Story
+POST {{baseUrl}}/api/v1/quizzes/generate/{{storyId}}
+Authorization: Bearer {{accessToken}}
+
+### 9. Get Quiz by ID
+GET {{baseUrl}}/api/v1/quizzes/{{quizId}}
+Authorization: Bearer {{accessToken}}
+
+### 10. Submit Quiz
+POST {{baseUrl}}/api/v1/quizzes/submit
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "quizId": "{{quizId}}",
+  "userAnswers": {
+    "1": "A",
+    "2": "B",
+    "3": "C",
+    "4": "D",
+    "5": "A"
+  },
+  "timeSpent": 180
+}
+
+### 11. Get Quiz History
+GET {{baseUrl}}/api/v1/quizzes/history
+Authorization: Bearer {{accessToken}}
+
+### 12. Translate Word
+POST {{baseUrl}}/api/v1/translations
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "text": "breakfast",
+  "sourceLang": "en",
+  "targetLang": "tr",
+  "isWord": true
+}
+
+### 13. Get Cached Translations for Story
+GET {{baseUrl}}/api/v1/translations/story/{{storyId}}
+Authorization: Bearer {{accessToken}}
+
+### 14. Get User Progress
+GET {{baseUrl}}/api/v1/progress
+Authorization: Bearer {{accessToken}}
+
+### 15. Track Event
+POST {{baseUrl}}/api/v1/progress/track
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "eventType": "WordTap",
+  "eventData": {
+    "word": "breakfast",
+    "storyId": "{{storyId}}",
+    "timestamp": "2025-10-13T10:00:00Z"
+  }
+}
+
+### 16. Complete Story
+POST {{baseUrl}}/api/v1/stories/{{storyId}}/complete
+Authorization: Bearer {{accessToken}}
+
+### 17. Delete Story
+DELETE {{baseUrl}}/api/v1/stories/{{storyId}}
+Authorization: Bearer {{accessToken}}
+
+###############################################
+### Quick Test Flow:
+### 1. Register (Copy response)
+### 2. Login (Copy accessToken)
+### 3. Update @accessToken variable above
+### 4. Generate Story (Copy storyId)
+### 5. Generate Quiz (Copy quizId)
+### 6. Submit Quiz
+### 7. Check Progress
+###############################################

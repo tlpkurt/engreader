@@ -1,0 +1,68 @@
+name: engreader_app
+description: "Engreader - Personalized English Reading Practice Platform"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # State Management
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+  
+  # Navigation
+  go_router: ^14.2.7
+  
+  # HTTP Client
+  dio: ^5.7.0
+  
+  # Local Storage
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  flutter_secure_storage: ^9.2.2
+  
+  # Code Generation
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+  
+  # UI
+  flutter_svg: ^2.0.10+1
+  google_fonts: ^6.2.1
+  
+  # Utilities
+  intl: ^0.19.0
+  equatable: ^2.0.5
+  
+  # Icons
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  
+  # Build Runners
+  build_runner: ^2.4.12
+  riverpod_generator: ^2.4.3
+  freezed: ^2.5.7
+  json_serializable: ^6.8.0
+  
+  # Linting
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  
+  # Assets
+  # assets:
+  #   - assets/images/
+  #   - assets/icons/
+  
+  # Fonts
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
