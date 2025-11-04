@@ -10,15 +10,47 @@ class QuizRemoteDataSource {
   /// Generate quiz for a story
   Future<QuizModel> generateQuiz(String storyId) async {
     try {
+      // Backend expects: POST /quizzes/generate/{storyId}
       final response = await _apiClient.post(
-        AppConfig.quizzesEndpoint,
-        data: {
-          'storyId': storyId,
-        },
+        '${AppConfig.quizzesEndpoint}/generate/$storyId',
       );
-      // Backend returns ApiResponse wrapper, extract data
-      return QuizModel.fromJson(response.data['data']);
+      
+      // Check if response has data
+      if (response.data == null) {
+        throw Exception('No data received from server');
+      }
+      
+      // Handle ApiResponse wrapper format
+      final responseData = response.data;
+      
+      if (responseData is Map<String, dynamic>) {
+        // Check for success field
+        final isSuccess = responseData['success'] ?? responseData['isSuccess'];
+        
+        if (isSuccess == false) {
+          final message = responseData['message']?.toString() ?? 'Failed to generate quiz';
+          throw Exception(message);
+        }
+        
+        // Extract data field
+        if (responseData.containsKey('data')) {
+          final data = responseData['data'];
+          if (data == null) {
+            throw Exception('Quiz data is null');
+          }
+          return QuizModel.fromJson(data as Map<String, dynamic>);
+        }
+        
+        // If response data is directly the quiz (no wrapper)
+        return QuizModel.fromJson(responseData);
+      }
+      
+      throw Exception('Invalid response format');
     } catch (e) {
+      // Provide more context in error message
+      if (e.toString().contains('type') && e.toString().contains('subtype')) {
+        throw Exception('Invalid data format from server. Please check backend response structure.');
+      }
       rethrow;
     }
   }
@@ -29,14 +61,22 @@ class QuizRemoteDataSource {
     required List<AnswerModel> answers,
   }) async {
     try {
+      // Backend expects: POST /quizzes/submit with quizId and answers in body
       final response = await _apiClient.post(
-        '${AppConfig.quizzesEndpoint}/$quizId/submit',
+        '${AppConfig.quizzesEndpoint}/submit',
         data: {
+          'quizId': quizId,
           'answers': answers.map((a) => a.toJson()).toList(),
         },
       );
-      // Backend returns ApiResponse wrapper, extract data
-      return QuizResultModel.fromJson(response.data['data']);
+      
+      // Handle ApiResponse wrapper
+      final responseData = response.data;
+      if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
+        return QuizResultModel.fromJson(responseData['data']);
+      }
+      
+      return QuizResultModel.fromJson(responseData);
     } catch (e) {
       rethrow;
     }

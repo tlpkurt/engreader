@@ -152,20 +152,17 @@ public class TranslationServiceImpl : ITranslationService
             max_tokens = 200
         };
 
-        var content = new StringContent(
-            JsonSerializer.Serialize(requestBody),
-            Encoding.UTF8,
-            "application/json"
-        );
+        var request = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/chat/completions")
+        {
+            Content = new StringContent(
+                JsonSerializer.Serialize(requestBody),
+                Encoding.UTF8,
+                "application/json")
+        };
+        
+        request.Headers.Add("Authorization", $"Bearer {_settings.ApiKey}");
 
-        _httpClient.DefaultRequestHeaders.Clear();
-        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_settings.ApiKey}");
-
-        var response = await _httpClient.PostAsync(
-            "https://api.openai.com/v1/chat/completions",
-            content
-        );
-
+        var response = await _httpClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
 
         var result = await response.Content.ReadFromJsonAsync<OpenAIResponse>();

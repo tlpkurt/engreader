@@ -25,7 +25,9 @@ public class Story : BaseEntity
     // Metadata
     public int WordCount { get; set; }
     public int ReadingTimeMinutes { get; set; }
+    public bool IsCompleted { get; set; }
     public DateTime? CompletedAt { get; set; }
+    public int ReadingTimeSeconds { get; set; }
     
     // Navigation properties
     public virtual ICollection<Quiz> Quizzes { get; set; } = new List<Quiz>();

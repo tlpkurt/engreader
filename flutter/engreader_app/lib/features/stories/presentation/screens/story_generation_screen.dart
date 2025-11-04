@@ -97,7 +97,10 @@ class _StoryGenerationScreenState extends ConsumerState<StoryGenerationScreen> {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Generate Story'),
+        title: const Text(
+          'Generate Story',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => context.go('/stories'),
@@ -113,7 +116,9 @@ class _StoryGenerationScreenState extends ConsumerState<StoryGenerationScreen> {
               // Header
               Text(
                 'Create Your Personalized Story',
-                style: theme.textTheme.headlineMedium,
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
@@ -231,45 +236,47 @@ class _StoryGenerationScreenState extends ConsumerState<StoryGenerationScreen> {
               const SizedBox(height: 32),
               
               // Generate Button
-              ElevatedButton(
-                onPressed: isGenerating ? null : _generateStory,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+              SizedBox(
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: isGenerating ? null : _generateStory,
+                  child: isGenerating
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              'Generating Story...',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.auto_awesome),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Generate Story',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
                 ),
-                child: isGenerating
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            'Generating Story...',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.auto_awesome),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Generate Story',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
               ),
               const SizedBox(height: 16),
               

@@ -53,6 +53,7 @@ class _StoryReadingScreenState extends ConsumerState<StoryReadingScreen> {
   Future<void> _translateWord(String word, String targetLanguage) async {
     setState(() {
       _selectedWord = word;
+      _selectedSentence = null; // Clear sentence selection
       _showTranslation = true;
     });
 
@@ -62,6 +63,7 @@ class _StoryReadingScreenState extends ConsumerState<StoryReadingScreen> {
         sourceLanguage: 'en',
         targetLanguage: targetLanguage,
         storyId: widget.storyId,
+        isWord: true,
       );
     } catch (e) {
       if (mounted) {
@@ -77,6 +79,7 @@ class _StoryReadingScreenState extends ConsumerState<StoryReadingScreen> {
 
   Future<void> _translateSentence(String sentence, String targetLanguage) async {
     setState(() {
+      _selectedWord = null; // Clear word selection
       _selectedSentence = sentence;
       _showTranslation = true;
     });
@@ -87,6 +90,7 @@ class _StoryReadingScreenState extends ConsumerState<StoryReadingScreen> {
         sourceLanguage: 'en',
         targetLanguage: targetLanguage,
         storyId: widget.storyId,
+        isWord: false,
       );
     } catch (e) {
       if (mounted) {
@@ -316,8 +320,34 @@ class _StoryReadingScreenState extends ConsumerState<StoryReadingScreen> {
   }
 
   Widget _buildInteractiveParagraph(String paragraph, ThemeData theme, List<String> targetWords, String targetLanguage) {
-    // Split paragraph into words
-    final words = paragraph.split(' ');
+    // Split paragraph into sentences
+    final sentences = _splitIntoSentences(paragraph);
+    
+    // Build all sentences inline
+    List<Widget> allWidgets = [];
+    for (var sentence in sentences) {
+      allWidgets.add(
+        GestureDetector(
+          onLongPress: () => _handleSentenceLongPress(sentence, targetLanguage),
+          child: _buildSentenceWithWords(sentence, theme, targetWords, targetLanguage),
+        ),
+      );
+    }
+    
+    return Wrap(
+      children: allWidgets,
+    );
+  }
+
+  List<String> _splitIntoSentences(String paragraph) {
+    // Split by sentence-ending punctuation (., !, ?)
+    final sentences = paragraph.split(RegExp(r'(?<=[.!?])\s+'));
+    return sentences.where((s) => s.trim().isNotEmpty).toList();
+  }
+
+  Widget _buildSentenceWithWords(String sentence, ThemeData theme, List<String> targetWords, String targetLanguage) {
+    // Split sentence into words
+    final words = sentence.split(' ');
     
     return Wrap(
       children: words.map((word) {
@@ -330,7 +360,6 @@ class _StoryReadingScreenState extends ConsumerState<StoryReadingScreen> {
         
         return GestureDetector(
           onTap: () => _handleWordTap(cleanWord, targetLanguage),
-          onLongPress: () => _handleSentenceLongPress(paragraph, targetLanguage),
           child: Container(
             padding: isTargetWord
                 ? const EdgeInsets.symmetric(horizontal: 2, vertical: 1)
@@ -456,7 +485,7 @@ class _StoryReadingScreenState extends ConsumerState<StoryReadingScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  translationState.translation!.translatedText,
+                  translationState.translation!.targetText,
                   style: theme.textTheme.bodyLarge,
                 ),
               )
@@ -492,19 +521,20 @@ class _StoryReadingScreenState extends ConsumerState<StoryReadingScreen> {
   }
 
   Widget _buildActionButtons(ThemeData theme, StoryModel story) {
+    // Check if quiz is available in story
+    final hasQuiz = story.quiz != null && story.quiz!.questions.isNotEmpty;
+    
     return Row(
       children: [
         Expanded(
           child: OutlinedButton.icon(
-            onPressed: () {
-              context.go('/stories/${story.id}/quiz');
-              // context.go('/quizzes/generate/${widget.storyId}');
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Quiz feature coming soon!')),
-              );
-            },
+            onPressed: hasQuiz 
+                ? () {
+                    context.go('/stories/${story.id}/quiz');
+                  }
+                : null,
             icon: const Icon(Icons.quiz_outlined),
-            label: const Text('Take Quiz'),
+            label: Text(hasQuiz ? 'Take Quiz (${story.quiz!.questions.length})' : 'Quiz Loading...'),
           ),
         ),
         const SizedBox(width: 12),

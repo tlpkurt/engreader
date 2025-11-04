@@ -3,6 +3,7 @@ using System;
 using Engreader.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Engreader.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(EngreaderDbContext))]
-    partial class EngreaderDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251104102821_UpdateQuizAttemptAnswersToStringKeys")]
+    partial class UpdateQuizAttemptAnswersToStringKeys
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -172,9 +175,6 @@ namespace Engreader.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("boolean");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
@@ -182,9 +182,6 @@ namespace Engreader.Infrastructure.Persistence.Migrations
                         .HasColumnType("integer");
 
                     b.Property<int>("ReadingTimeMinutes")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ReadingTimeSeconds")
                         .HasColumnType("integer");
 
                     b.Property<int>("Status")

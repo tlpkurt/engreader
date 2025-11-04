@@ -13,7 +13,10 @@ class ProgressScreen extends ConsumerWidget {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Progress'),
+        title: const Text(
+          'My Progress',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -107,10 +110,10 @@ class ProgressScreen extends ConsumerWidget {
                     Icons.star,
                     'Avg Score',
                     '${progress.averageQuizScore.toStringAsFixed(0)}%',
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
           const SizedBox(height: 24),
           
           // Coming Soon

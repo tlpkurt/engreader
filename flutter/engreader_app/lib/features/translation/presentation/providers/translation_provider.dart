@@ -55,6 +55,7 @@ class TranslationNotifier extends StateNotifier<TranslationState> {
     required String sourceLanguage,
     required String targetLanguage,
     String? storyId,
+    required bool isWord,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
@@ -63,6 +64,7 @@ class TranslationNotifier extends StateNotifier<TranslationState> {
         sourceLanguage: sourceLanguage,
         targetLanguage: targetLanguage,
         storyId: storyId,
+        isWord: isWord,
       );
       state = state.copyWith(
         translation: translation,

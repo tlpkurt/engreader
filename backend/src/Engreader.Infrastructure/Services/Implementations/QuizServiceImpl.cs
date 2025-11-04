@@ -110,7 +110,8 @@ public class QuizServiceImpl : IQuizService
 
         foreach (var question in quiz.Questions.OrderBy(q => q.QuestionNumber))
         {
-            var userAnswer = request.Answers.GetValueOrDefault(question.QuestionNumber, "");
+            // Parse question number from string key (JSON sends numbers as strings)
+            var userAnswer = request.Answers.GetValueOrDefault(question.QuestionNumber.ToString(), "");
             var isCorrect = userAnswer.Equals(question.CorrectAnswer, StringComparison.OrdinalIgnoreCase);
 
             if (isCorrect)

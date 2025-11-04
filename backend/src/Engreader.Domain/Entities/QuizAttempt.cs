@@ -15,8 +15,8 @@ public class QuizAttempt : BaseEntity
     public decimal Percentage { get; set; } // 0-100%
     public int TimeSpentSeconds { get; set; }
     
-    // User answers
-    public Dictionary<int, string> UserAnswers { get; set; } = new(); // QuestionNumber -> Answer
+    // User answers (stored as string keys for JSON compatibility)
+    public Dictionary<string, string> UserAnswers { get; set; } = new(); // QuestionNumber (as string) -> Answer
     
     public DateTime CompletedAt { get; set; } = DateTime.UtcNow;
 }

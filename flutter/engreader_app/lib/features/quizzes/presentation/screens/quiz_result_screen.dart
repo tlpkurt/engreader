@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../quiz/presentation/providers/quiz_provider.dart';
 
-class QuizResultScreen extends ConsumerWidget {
-  final String quizId;
+class QuizResultScreen extends StatelessWidget {
+  final Map<String, dynamic>? resultData;
   
   const QuizResultScreen({
     super.key,
-    required this.quizId,
+    this.resultData,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final submissionState = ref.watch(quizSubmissionProvider);
 
-    if (submissionState.result == null) {
+    if (resultData == null) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Quiz Results'),
+          title: const Text(
+            'Quiz Results',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
         ),
         body: Center(
           child: Column(
@@ -43,15 +43,18 @@ class QuizResultScreen extends ConsumerWidget {
       );
     }
 
-    final result = submissionState.result!;
-    final score = result.score;
-    final totalQuestions = result.totalQuestions;
-    final percentage = (score / totalQuestions * 100).round();
+    final score = resultData!['score'] as int;
+    final totalQuestions = resultData!['totalQuestions'] as int;
+    final percentage = (resultData!['percentage'] as num).toDouble();
     final passed = percentage >= 60;
+    final results = resultData!['results'] as List<dynamic>;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Quiz Results'),
+        title: const Text(
+          'Quiz Results',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => context.go('/stories'),
@@ -154,45 +157,36 @@ class QuizResultScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           
           // Questions Review
-          ...List.generate(result.questions.length, (index) {
-            final question = result.questions[index];
+          ...results.map((result) {
+            final questionNumber = result['questionNumber'] as int;
+            final questionText = result['questionText'] as String;
+            final userAnswer = result['userAnswer'] as String;
+            final correctAnswer = result['correctAnswer'] as String;
+            final isCorrect = result['isCorrect'] as bool;
+            final explanation = result['explanation'] as String?;
+            
             return _buildQuestionReview(
               theme,
-              question,
-              index + 1,
+              questionNumber,
+              questionText,
+              userAnswer,
+              correctAnswer,
+              isCorrect,
+              explanation,
             );
-          }),
+          }).toList(),
           
           const SizedBox(height: 16),
           
-          // Action Buttons
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    // Clear submission state and go back to stories
-                    ref.read(quizSubmissionProvider.notifier).clearResult();
-                    context.go('/stories');
-                  },
-                  icon: const Icon(Icons.home_outlined),
-                  label: const Text('Back to Stories'),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    // Clear states and retry quiz
-                    ref.read(quizSubmissionProvider.notifier).clearResult();
-                    ref.read(quizGenerationProvider.notifier).clearQuiz();
-                    context.pop();
-                  },
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Retry Quiz'),
-                ),
-              ),
-            ],
+          // Action Button
+          SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: ElevatedButton.icon(
+              onPressed: () => context.go('/stories'),
+              icon: const Icon(Icons.home_outlined),
+              label: const Text('Back to Stories'),
+            ),
           ),
           const SizedBox(height: 16),
         ],
@@ -202,13 +196,13 @@ class QuizResultScreen extends ConsumerWidget {
 
   Widget _buildQuestionReview(
     ThemeData theme,
-    dynamic question,
     int questionNumber,
+    String questionText,
+    String userAnswer,
+    String correctAnswer,
+    bool isCorrect,
+    String? explanation,
   ) {
-    final userAnswer = question.userAnswerIndex;
-    final correctAnswer = question.correctAnswerIndex;
-    final isCorrect = userAnswer == correctAnswer;
-
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -263,102 +257,139 @@ class QuizResultScreen extends ConsumerWidget {
             
             // Question Text
             Text(
-              question.question,
+              questionText,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             
-            // Options
-            ...List.generate(question.options.length, (index) {
-              final isUserAnswer = userAnswer == index;
-              final isCorrectAnswer = correctAnswer == index;
-              final showAsCorrect = isCorrectAnswer;
-              final showAsIncorrect = isUserAnswer && !isCorrect;
-              
-              return Container(
-                margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: showAsCorrect
-                      ? Colors.green.withOpacity(0.1)
-                      : showAsIncorrect
-                          ? Colors.red.withOpacity(0.1)
-                          : Colors.transparent,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: showAsCorrect
-                        ? Colors.green
-                        : showAsIncorrect
-                            ? Colors.red
-                            : theme.colorScheme.outline.withOpacity(0.3),
-                    width: showAsCorrect || showAsIncorrect ? 2 : 1,
+            // Your Answer
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: isCorrect
+                    ? Colors.green.withOpacity(0.1)
+                    : Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: isCorrect ? Colors.green : Colors.red,
+                  width: 2,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    isCorrect ? Icons.check_circle : Icons.cancel,
+                    size: 20,
+                    color: isCorrect ? Colors.green : Colors.red,
                   ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      showAsCorrect
-                          ? Icons.check_circle
-                          : showAsIncorrect
-                              ? Icons.cancel
-                              : Icons.circle_outlined,
-                      size: 20,
-                      color: showAsCorrect
-                          ? Colors.green
-                          : showAsIncorrect
-                              ? Colors.red
-                              : theme.colorScheme.onSurface.withOpacity(0.3),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        question.options[index],
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontWeight: showAsCorrect || showAsIncorrect
-                              ? FontWeight.w600
-                              : FontWeight.normal,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Your Answer',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withOpacity(0.6),
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
+                        const SizedBox(height: 4),
+                        Text(
+                          userAnswer.isEmpty ? 'Not answered' : userAnswer,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              );
-            }),
-            
-            // Explanation (if available)
-            if (question.explanation != null && question.explanation.isNotEmpty) ...[
+                  ),
+                ],
+              ),
+            ),
+
+            // Correct Answer (if wrong)
+            if (!isCorrect) ...[
               const SizedBox(height: 12),
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceVariant.withOpacity(0.5),
+                  color: Colors.green.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Colors.green,
+                    width: 2,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.lightbulb,
+                      size: 20,
+                      color: Colors.green,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Correct Answer',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.onSurface.withOpacity(0.6),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            correctAnswer,
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.green.shade700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            
+            // Explanation (if available)
+            if (explanation != null && explanation.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primaryContainer.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Icon(
-                      Icons.lightbulb_outline,
+                      Icons.info_outline,
                       size: 20,
                       color: theme.colorScheme.primary,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Explanation',
-                            style: theme.textTheme.bodySmall?.copyWith(
+                            style: theme.textTheme.labelSmall?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: theme.colorScheme.primary,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            question.explanation!,
+                            explanation,
                             style: theme.textTheme.bodyMedium,
                           ),
                         ],

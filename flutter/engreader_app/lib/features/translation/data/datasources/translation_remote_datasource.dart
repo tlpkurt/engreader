@@ -13,12 +13,14 @@ class TranslationRemoteDataSource {
     required String sourceLanguage,
     required String targetLanguage,
     String? storyId,
+    required bool isWord,
   }) async {
     try {
       final response = await _apiClient.post(
         AppConfig.translationsEndpoint,
         data: {
-          'text': text,
+          'sourceText': text,
+          'isWord': isWord,
           'sourceLanguage': sourceLanguage,
           'targetLanguage': targetLanguage,
           if (storyId != null) 'storyId': storyId,

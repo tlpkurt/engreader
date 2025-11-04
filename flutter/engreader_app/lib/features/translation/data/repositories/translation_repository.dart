@@ -12,6 +12,7 @@ class TranslationRepository {
     required String sourceLanguage,
     required String targetLanguage,
     String? storyId,
+    required bool isWord,
   }) async {
     // Try to get from cache first
     final cached = await _remoteDataSource.getCachedTranslation(
@@ -30,6 +31,7 @@ class TranslationRepository {
       sourceLanguage: sourceLanguage,
       targetLanguage: targetLanguage,
       storyId: storyId,
+      isWord: isWord,
     );
   }
 }

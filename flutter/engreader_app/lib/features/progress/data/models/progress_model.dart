@@ -7,13 +7,16 @@ part 'progress_model.g.dart';
 class ProgressModel with _$ProgressModel {
   const factory ProgressModel({
     required String userId,
-    String? currentCefrLevel,
+    @JsonKey(name: 'currentLevel') String? currentCefrLevel,
     @Default(0) int totalStoriesRead,
-    @Default(0) int totalQuizzesTaken,
-    @Default(0) int currentStreak,
+    @JsonKey(name: 'totalQuizzesCompleted') @Default(0) int totalQuizzesTaken,
+    @JsonKey(name: 'streakDays') @Default(0) int currentStreak,
     @Default(0) int longestStreak,
     @Default(0.0) double averageQuizScore,
-    DateTime? lastActivityDate,
+    @Default(0) int totalWordsLearned,
+    @Default(0) int totalTranslationsViewed,
+    @Default(0) int totalReadingTimeMinutes,
+    @JsonKey(name: 'lastReadingDate') DateTime? lastActivityDate,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) = _ProgressModel;

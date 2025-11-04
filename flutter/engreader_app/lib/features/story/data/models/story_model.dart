@@ -12,29 +12,24 @@ class StoryModel with _$StoryModel {
     String? userId,  // Optional, backend doesn't always send it
     required String title,
     String? content,  // Optional - not in list view
-    @JsonKey(name: 'level') required int cefrLevel,  // Backend sends "level" as int (0=A1, 1=A2, etc.)
+    @JsonKey(name: 'level') required String cefrLevel,  // Backend sends "level" as string (A1, A2, etc.)
     required int wordCount,
     @JsonKey(defaultValue: []) List<String>? targetWords,  // Optional - not in list view
     String? topic,
-    @JsonKey(name: 'status') int? status,  // Backend status (0=Pending, 1=Generating, 2=Generated, 3=Failed)
+    @JsonKey(name: 'status') String? status,  // Backend status as string enum
     bool? isCompleted,
     int? readingTimeSeconds,
     @JsonKey(name: 'readingTimeMinutes') int? readingTimeMinutes,  // Backend uses minutes
     DateTime? completedAt,
     DateTime? createdAt,
+    QuizData? quiz,  // Quiz included with story
   }) = _StoryModel;
 
   factory StoryModel.fromJson(Map<String, dynamic> json) =>
       _$StoryModelFromJson(json);
   
-  /// Convert CEFR level int to string (0=A1, 1=A2, 2=B1, 3=B2, 4=C1, 5=C2)
-  String get cefrLevelString {
-    const levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-    if (cefrLevel >= 0 && cefrLevel < levels.length) {
-      return levels[cefrLevel];
-    }
-    return 'A1'; // Default
-  }
+  /// CEFR level is already a string, just return it
+  String get cefrLevelString => cefrLevel;
 }
 
 @freezed
@@ -56,3 +51,33 @@ class StoryGenerationRequest with _$StoryGenerationRequest {
         'wordCount': wordCount,
       };
 }
+
+@freezed
+class QuizData with _$QuizData {
+  const factory QuizData({
+    required String id,
+    required String storyId,
+    String? title,
+    required List<QuizQuestionData> questions,
+  }) = _QuizData;
+
+  factory QuizData.fromJson(Map<String, dynamic> json) =>
+      _$QuizDataFromJson(json);
+}
+
+@freezed
+class QuizQuestionData with _$QuizQuestionData {
+  const factory QuizQuestionData({
+    required String id,
+    @JsonKey(name: 'questionNumber') required int questionNumber,
+    @JsonKey(name: 'questionText') required String question,
+    @JsonKey(name: 'optionA') required String optionA,
+    @JsonKey(name: 'optionB') required String optionB,
+    @JsonKey(name: 'optionC') required String optionC,
+    @JsonKey(name: 'optionD') required String optionD,
+  }) = _QuizQuestionData;
+
+  factory QuizQuestionData.fromJson(Map<String, dynamic> json) =>
+      _$QuizQuestionDataFromJson(json);
+}
+

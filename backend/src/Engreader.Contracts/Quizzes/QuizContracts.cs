@@ -28,7 +28,7 @@ public record QuizQuestionDto(
 /// </summary>
 public record SubmitQuizRequest(
     Guid QuizId,
-    Dictionary<int, string> Answers, // QuestionNumber -> Answer (A/B/C/D)
+    Dictionary<string, string> Answers, // QuestionNumber (as string) -> Answer (A/B/C/D)
     int TimeSpentSeconds
 );
 

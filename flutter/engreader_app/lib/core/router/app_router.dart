@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/home/presentation/screens/landing_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/stories/presentation/screens/story_list_screen.dart';
@@ -11,8 +12,15 @@ import '../../features/progress/presentation/screens/progress_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/login',
+    initialLocation: '/',
     routes: [
+      // Home Route
+      GoRoute(
+        path: '/',
+        name: 'home',
+        builder: (context, state) => const LandingScreen(),
+      ),
+      
       // Auth Routes
       GoRoute(
         path: '/login',
@@ -55,11 +63,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: '/quiz/result/:quizId',
+        path: '/quiz/result',
         name: 'quiz-result',
         builder: (context, state) {
-          final quizId = state.pathParameters['quizId']!;
-          return QuizResultScreen(quizId: quizId);
+          final resultData = state.extra as Map<String, dynamic>?;
+          return QuizResultScreen(resultData: resultData);
         },
       ),
       

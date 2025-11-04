@@ -66,8 +66,18 @@ class StoryRemoteDataSource {
         '${AppConfig.storiesEndpoint}/$storyId',
       );
       // Backend returns ApiResponse wrapper, extract data
-      return StoryModel.fromJson(response.data['data']);
-    } catch (e) {
+      final data = response.data['data'];
+      print('📥 Story Response Data: $data');
+      
+      // Check if quiz exists and has valid structure
+      if (data['quiz'] != null) {
+        print('📝 Quiz Data: ${data['quiz']}');
+      }
+      
+      return StoryModel.fromJson(data);
+    } catch (e, stackTrace) {
+      print('❌ Error parsing story: $e');
+      print('📚 StackTrace: $stackTrace');
       rethrow;
     }
   }

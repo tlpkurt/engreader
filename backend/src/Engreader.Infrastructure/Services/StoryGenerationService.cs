@@ -117,7 +117,15 @@ Guidelines:
 5. Use appropriate grammar and vocabulary for {level} level
 6. Make it relevant to the topic
 
-Write ONLY the story, no additional commentary.";
+FORMAT YOUR RESPONSE EXACTLY LIKE THIS:
+TITLE: [Write a short, catchy title for the story (max 8 words)]
+
+[Write the story here]
+
+Example:
+TITLE: Tom's New Car Adventure
+
+Tom loves cars. He wants to buy a new car...";
     }
 
     // OpenAI API response models

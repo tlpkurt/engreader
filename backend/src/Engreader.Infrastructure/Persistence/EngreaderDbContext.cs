@@ -90,9 +90,10 @@ public class EngreaderDbContext : DbContext
             entity.HasOne(e => e.Quiz).WithMany(q => q.Attempts).HasForeignKey(e => e.QuizId);
             
             // Value converter for Dictionary to JSON string (supports both PostgreSQL and In-Memory)
-            var dictionaryConverter = new ValueConverter<Dictionary<int, string>, string>(
+            // Changed from Dictionary<int, string> to Dictionary<string, string> for JSON compatibility
+            var dictionaryConverter = new ValueConverter<Dictionary<string, string>, string>(
                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
-                v => JsonSerializer.Deserialize<Dictionary<int, string>>(v, (JsonSerializerOptions?)null) ?? new Dictionary<int, string>()
+                v => JsonSerializer.Deserialize<Dictionary<string, string>>(v, (JsonSerializerOptions?)null) ?? new Dictionary<string, string>()
             );
             
             entity.Property(e => e.UserAnswers)

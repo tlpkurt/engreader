@@ -37,10 +37,15 @@ class _StoryListScreenState extends ConsumerState<StoryListScreen> {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Stories'),
+        title: const Text(
+          'My Stories',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.person_outline),
+            icon: const Icon(Icons.logout),
             onPressed: () {
               // Logout action
               ref.read(authProvider.notifier).logout();
@@ -61,96 +66,107 @@ class _StoryListScreenState extends ConsumerState<StoryListScreen> {
           // Welcome Card
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              padding: const EdgeInsets.all(20),
+              child: Row(
                 children: [
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
-                        child: Icon(
-                          Icons.person,
-                          color: theme.colorScheme.primary,
+                  CircleAvatar(
+                    radius: 28,
+                    backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
+                    child: Icon(
+                      Icons.person,
+                      color: theme.colorScheme.primary,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Welcome back! 👋',
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Ready to read and learn?',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  progressAsync.when(
+                    data: (progress) => Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.shade50,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.orange.shade200,
+                          width: 1,
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Welcome back!',
-                              style: theme.textTheme.titleMedium,
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.local_fire_department,
+                            color: Colors.orange.shade700,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '${progress.currentStreak}',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: Colors.orange.shade700,
+                              fontWeight: FontWeight.bold,
                             ),
-                            Text(
-                              'Ready to read?',
-                              style: theme.textTheme.bodySmall,
+                          ),
+                        ],
+                      ),
+                    ),
+                    loading: () => const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    error: (_, __) => Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.grey.shade300,
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.local_fire_department_outlined,
+                            color: Colors.grey.shade600,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '0',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: Colors.grey.shade600,
+                              fontWeight: FontWeight.bold,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      progressAsync.when(
-                        data: (progress) => Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.secondary.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.local_fire_department,
-                                color: theme.colorScheme.secondary,
-                                size: 16,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '${progress.currentStreak}',
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  color: theme.colorScheme.secondary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        loading: () => const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                        error: (_, __) => Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.secondary.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.local_fire_department,
-                                color: theme.colorScheme.secondary,
-                                size: 16,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '0',
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  color: theme.colorScheme.secondary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ],
               ),
@@ -161,10 +177,17 @@ class _StoryListScreenState extends ConsumerState<StoryListScreen> {
           // Generate Story Button
           SizedBox(
             width: double.infinity,
+            height: 56,
             child: ElevatedButton.icon(
               onPressed: () => context.go('/stories/generate'),
               icon: const Icon(Icons.auto_awesome),
-              label: const Text('Generate New Story'),
+              label: const Text(
+                'Generate New Story',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 24),
@@ -175,7 +198,9 @@ class _StoryListScreenState extends ConsumerState<StoryListScreen> {
             children: [
               Text(
                 'Recent Stories',
-                style: theme.textTheme.titleLarge,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               TextButton(
                 onPressed: () {
@@ -287,108 +312,175 @@ class _StoryListScreenState extends ConsumerState<StoryListScreen> {
     );
   }
 
+  String _getStoryPreview(dynamic story) {
+    // Story list doesn't include content, so we'll just show the title for preview
+    // The actual content is only available when viewing the full story
+    if (story.content == null || story.content!.isEmpty) {
+      // For list view, just show a placeholder or nothing
+      return '';
+    }
+    
+    var content = story.content!.trim();
+    
+    // Get first 120 characters for preview
+    if (content.length > 120) {
+      // Try to cut at a word boundary
+      var cutPoint = content.lastIndexOf(' ', 120);
+      if (cutPoint > 80) {
+        return '${content.substring(0, cutPoint)}...';
+      }
+      return '${content.substring(0, 120)}...';
+    }
+    
+    return content;
+  }
+
   Widget _buildStoryCard(BuildContext context, dynamic story) {
     final theme = Theme.of(context);
+    final isCompleted = story.isCompleted == true;
+    
+    // Debug: Check completion status
+    print('Story ${story.id} - isCompleted: ${story.isCompleted} - showing badge: $isCompleted');
     
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        onTap: () {
-          context.go('/stories/${story.id}/read');
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+      child: Stack(
+        children: [
+          InkWell(
+            onTap: () {
+              context.go('/stories/${story.id}/read');
+            },
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          story.cefrLevelString,
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          story.title ?? 'Untitled Story',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 80), // Space for completion badge
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.article_outlined,
+                        size: 16,
+                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${story.wordCount} words',
+                        style: theme.textTheme.bodySmall,
+                      ),
+                      const SizedBox(width: 16),
+                      Icon(
+                        Icons.schedule,
+                        size: 16,
+                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${(story.wordCount / 150).ceil()} min',
+                        style: theme.textTheme.bodySmall,
+                      ),
+                      if (story.topic != null) ...[
+                        const SizedBox(width: 16),
+                        Icon(
+                          Icons.topic_outlined,
+                          size: 16,
+                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        ),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            story.topic!,
+                            style: theme.textTheme.bodySmall,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Completion Badge - Top Right Corner
+          if (isCompleted)
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.green.shade400,
+                      Colors.green.shade600,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.green.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(4),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.check_circle,
+                      color: Colors.white,
+                      size: 18,
                     ),
-                    child: Text(
-                      story.cefrLevelString,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.primary,
+                    const SizedBox(width: 6),
+                    Text(
+                      'Completed',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      story.title,
-                      style: theme.textTheme.titleMedium,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  if (story.isCompleted == true)
-                    Icon(
-                      Icons.check_circle,
-                      color: theme.colorScheme.secondary,
-                      size: 20,
-                    ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                story.content != null && story.content!.length > 100
-                    ? '${story.content!.substring(0, 100)}...'
-                    : story.content ?? story.title,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.6),
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Icon(
-                    Icons.article_outlined,
-                    size: 16,
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${story.wordCount} words',
-                    style: theme.textTheme.bodySmall,
-                  ),
-                  const SizedBox(width: 16),
-                  Icon(
-                    Icons.schedule,
-                    size: 16,
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${(story.wordCount / 150).ceil()} min',
-                    style: theme.textTheme.bodySmall,
-                  ),
-                  if (story.topic != null) ...[
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Text(
-                        '📚 ${story.topic}',
-                        style: theme.textTheme.bodySmall,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
                   ],
-                ],
+                ),
               ),
-            ],
-          ),
-        ),
+            ),
+        ],
       ),
     );
   }

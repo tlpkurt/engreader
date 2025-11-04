@@ -28,8 +28,11 @@ public record StoryResponse(
     decimal TargetWordPercentage,
     int WordCount,
     int ReadingTimeMinutes,
+    int ReadingTimeSeconds,
+    bool IsCompleted,
     DateTime CreatedAt,
-    DateTime? CompletedAt
+    DateTime? CompletedAt,
+    Quizzes.QuizResponse? Quiz = null  // Quiz included with story
 );
 
 /// <summary>
@@ -43,6 +46,7 @@ public record StoryListItem(
     StoryStatus Status,
     int WordCount,
     int ReadingTimeMinutes,
+    bool IsCompleted,
     DateTime CreatedAt
 );
 

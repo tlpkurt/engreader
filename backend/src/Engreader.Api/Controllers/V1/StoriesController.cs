@@ -107,6 +107,8 @@ public class StoriesController : ApiControllerBase
         try
         {
             var userId = GetCurrentUserId();
+            // Set storyId from route parameter
+            request = request with { StoryId = storyId };
             var response = await _storyService.CompleteStoryAsync(userId, request, cancellationToken);
             return Ok(ApiResponse<StoryResponse>.SuccessResponse(response, "Story marked as completed"));
         }
