@@ -1,11 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../config/app_config.dart';
+import '../storage/web_secure_storage.dart';
 
 class AuthInterceptor extends Interceptor {
   final Ref _ref;
-  final _storage = const FlutterSecureStorage();
+  final _storage = WebSecureStorage();
 
   AuthInterceptor(this._ref);
 

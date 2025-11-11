@@ -1,14 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../data/models/user_model.dart';
 import '../../data/models/auth_response_model.dart';
 import '../../data/datasources/auth_remote_datasource.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../../../../core/network/api_client.dart';
+import '../../../../core/storage/web_secure_storage.dart';
 
-// Secure Storage Provider
-final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
-  return const FlutterSecureStorage();
+// Web Secure Storage Provider
+final webSecureStorageProvider = Provider<WebSecureStorage>((ref) {
+  return WebSecureStorage();
 });
 
 // Auth Remote DataSource Provider
@@ -20,8 +20,8 @@ final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
 // Auth Repository Provider
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   final remoteDataSource = ref.watch(authRemoteDataSourceProvider);
-  final secureStorage = ref.watch(secureStorageProvider);
-  return AuthRepository(remoteDataSource, secureStorage);
+  final storage = ref.watch(webSecureStorageProvider);
+  return AuthRepository(remoteDataSource, storage);
 });
 
 // Auth State Provider

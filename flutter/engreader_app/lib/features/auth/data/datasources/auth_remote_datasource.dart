@@ -49,9 +49,16 @@ class AuthRemoteDataSource {
         },
       );
 
+      print('DEBUG Remote: Full response: ${response.data}');
+      print('DEBUG Remote: Data field: ${response.data['data']}');
+      
       // Backend returns ApiResponse wrapper, extract data
-      return AuthResponseModel.fromJson(response.data['data']);
-    } catch (e) {
+      final authResponse = AuthResponseModel.fromJson(response.data['data']);
+      print('DEBUG Remote: Parsed successfully');
+      return authResponse;
+    } catch (e, stackTrace) {
+      print('DEBUG Remote: Parse error: $e');
+      print('DEBUG Remote: Stack: $stackTrace');
       rethrow;
     }
   }

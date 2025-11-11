@@ -23,40 +23,33 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  @override
-  void initState() {
-    super.initState();
-    // Listen to auth state changes
-    Future.microtask(() {
-      ref.listenManual<AuthState>(
-        authProvider,
-        (previous, next) {
-          if (next.isAuthenticated && mounted) {
-            context.go('/stories');
-          }
-          if (next.error != null && mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(next.error!),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        },
-      );
-    });
-  }
-
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
     try {
+      print('DEBUG: Starting login...');
       await ref.read(authProvider.notifier).login(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
+      
+      print('DEBUG: Login successful, navigating...');
+      // Navigate immediately after successful login
+      if (mounted) {
+        print('DEBUG: Mounted, calling context.go');
+        context.go('/stories');
+        print('DEBUG: Navigation called');
+      }
     } catch (e) {
-      // Error is handled by the listener
+      print('DEBUG: Login error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Login failed: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 

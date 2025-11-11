@@ -1,13 +1,13 @@
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../models/auth_response_model.dart';
 import '../datasources/auth_remote_datasource.dart';
 import '../../../../core/config/app_config.dart';
+import '../../../../core/storage/web_secure_storage.dart';
 
 class AuthRepository {
   final AuthRemoteDataSource _remoteDataSource;
-  final FlutterSecureStorage _secureStorage;
+  final WebSecureStorage _storage;
 
-  AuthRepository(this._remoteDataSource, this._secureStorage);
+  AuthRepository(this._remoteDataSource, this._storage);
 
   /// Register new user
   Future<AuthResponseModel> register({
@@ -39,23 +39,32 @@ class AuthRepository {
     required String email,
     required String password,
   }) async {
-    final response = await _remoteDataSource.login(
-      email: email,
-      password: password,
-    );
+    try {
+      print('DEBUG Repo: Calling remote datasource...');
+      final response = await _remoteDataSource.login(
+        email: email,
+        password: password,
+      );
 
-    // Save tokens
-    await _saveTokens(
-      accessToken: response.accessToken,
-      refreshToken: response.refreshToken,
-    );
+      print('DEBUG Repo: Got response, saving tokens...');
+      // Save tokens
+      await _saveTokens(
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+      );
+      print('DEBUG Repo: Tokens saved successfully');
 
-    return response;
+      return response;
+    } catch (e, stackTrace) {
+      print('DEBUG Repo: Error in login: $e');
+      print('DEBUG Repo: Stack: $stackTrace');
+      rethrow;
+    }
   }
 
   /// Refresh access token
   Future<AuthResponseModel> refreshToken() async {
-    final refreshToken = await _secureStorage.read(
+    final refreshToken = await _storage.read(
       key: AppConfig.refreshTokenKey,
     );
 
@@ -84,7 +93,7 @@ class AuthRepository {
 
   /// Check if user is authenticated
   Future<bool> isAuthenticated() async {
-    final token = await _secureStorage.read(
+    final token = await _storage.read(
       key: AppConfig.accessTokenKey,
     );
     return token != null;
@@ -100,20 +109,31 @@ class AuthRepository {
     required String accessToken,
     required String refreshToken,
   }) async {
-    await _secureStorage.write(
-      key: AppConfig.accessTokenKey,
-      value: accessToken,
-    );
-    await _secureStorage.write(
-      key: AppConfig.refreshTokenKey,
-      value: refreshToken,
-    );
+    try {
+      print('DEBUG Repo: Writing access token...');
+      await _storage.write(
+        key: AppConfig.accessTokenKey,
+        value: accessToken,
+      );
+      print('DEBUG Repo: Access token written');
+      
+      print('DEBUG Repo: Writing refresh token...');
+      await _storage.write(
+        key: AppConfig.refreshTokenKey,
+        value: refreshToken,
+      );
+      print('DEBUG Repo: Refresh token written');
+    } catch (e, stackTrace) {
+      print('DEBUG Repo: Error saving tokens: $e');
+      print('DEBUG Repo: Stack: $stackTrace');
+      rethrow;
+    }
   }
 
   /// Clear all tokens
   Future<void> _clearTokens() async {
-    await _secureStorage.delete(key: AppConfig.accessTokenKey);
-    await _secureStorage.delete(key: AppConfig.refreshTokenKey);
-    await _secureStorage.delete(key: AppConfig.userDataKey);
+    await _storage.delete(key: AppConfig.accessTokenKey);
+    await _storage.delete(key: AppConfig.refreshTokenKey);
+    await _storage.delete(key: AppConfig.userDataKey);
   }
 }
